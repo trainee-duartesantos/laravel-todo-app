@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\TaskStatus;
 use App\Repositories\TaskRepositoryInterface;
 use Illuminate\Http\Request;
+use App\Enums\TaskPriority;
 
 class TaskController extends Controller
 {
@@ -14,13 +15,18 @@ class TaskController extends Controller
 
     public function index(Request $request)
     {
-        $status = $request->query('status');
+        $status = $request->status
+            ? TaskStatus::from($request->status)
+            : null;
+        
+        $priority = $request->priority
+            ? TaskPriority::from($request->priority)
+            : null;
 
         return view('tasks.index', [
-            'tasks' => $this->tasks->all(
-                $status ? TaskStatus::from($status) : null
-            ),
-            'currentStatus' => $status,
+            'tasks' => $this->tasks->all($status, $priority),
+            'currentStatus' => $request->status,
+            'currentPriority' => $request->priority,
         ]);
     }
 
@@ -28,9 +34,11 @@ class TaskController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'priority' => ['required'],
         ]);
 
         $data['status'] = TaskStatus::PENDING;
+        $data['completed'] = false;
 
         $this->tasks->create($data);
 

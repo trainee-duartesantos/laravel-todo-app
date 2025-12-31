@@ -5,14 +5,21 @@ namespace App\Repositories;
 use App\Models\Task;
 use Illuminate\Support\Collection;
 use App\Enums\TaskStatus;
+use App\Enums\TaskPriority;
 
 class EloquentTaskRepository implements TaskRepositoryInterface
 {
-    public function all(?TaskStatus $status = null): Collection
+    public function all(
+        ?TaskStatus $status = null,
+        ?TaskPriority $priority = null
+        ): Collection
     {
         return Task::query()
             ->when($status, fn ($q) =>
                 $q->where('status', $status->value)
+            )
+            ->when($priority, fn ($q) =>
+                $q->where('priority', $priority->value)
             )
             ->orderByDesc('created_at')
             ->get();

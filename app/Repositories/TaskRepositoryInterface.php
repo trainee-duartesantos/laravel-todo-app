@@ -4,13 +4,17 @@ namespace App\Repositories;
 
 use App\Models\Task;
 use App\Enums\TaskStatus;
+use App\Enums\TaskPriority;
 use Illuminate\Support\Collection;
 
 interface TaskRepositoryInterface
 {
-    public function all(?TaskStatus $status = null): Collection;
+    public function all(
+    ?TaskStatus $status = null,
+    ?TaskPriority $priority = null
+    ): Collection;
 
-    public function create(array $data): Task;
+    public function create(array $data);
 
     public function find(int $id): ?Task;
 

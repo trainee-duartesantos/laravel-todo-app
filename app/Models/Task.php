@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\TaskStatus;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\TaskPriority;
 
 class Task extends Model
 {
@@ -11,10 +12,12 @@ class Task extends Model
         'title',
         'status',
         'completed',
+        'priority',
     ];
 
     protected $casts = [
         'status' => TaskStatus::class,
+        'priority' => TaskPriority::class,
         'completed' => 'boolean',
     ];
 

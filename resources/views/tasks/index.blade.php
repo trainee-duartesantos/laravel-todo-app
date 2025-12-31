@@ -22,6 +22,16 @@
             class="flex-1 border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
             required
         >
+
+        <select
+            name="priority"
+            class="border rounded px-3 py-2"
+        >
+            <option value="low">Baixa</option>
+            <option value="medium" selected>Média</option>
+            <option value="high">Alta</option>
+        </select>
+
         <button
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
@@ -49,6 +59,29 @@
         </a>
     </div>
 
+    <div class="flex justify-center gap-2 mb-6">
+        <a href="/tasks"
+        class="px-3 py-1 rounded border {{ !$currentPriority ? 'bg-blue-600 text-white' : '' }}">
+            Todas
+        </a>
+
+        <a href="/tasks?priority=low"
+        class="px-3 py-1 rounded border {{ $currentPriority === 'low' ? 'bg-blue-600 text-white' : '' }}">
+            Baixa
+        </a>
+
+        <a href="/tasks?priority=medium"
+        class="px-3 py-1 rounded border {{ $currentPriority === 'medium' ? 'bg-blue-600 text-white' : '' }}">
+            Média
+        </a>
+
+        <a href="/tasks?priority=high"
+        class="px-3 py-1 rounded border {{ $currentPriority === 'high' ? 'bg-blue-600 text-white' : '' }}">
+            Alta
+        </a>
+    </div>
+
+
     {{-- Lista --}}
     <ul class="space-y-2">
         @foreach ($tasks as $task)
@@ -57,6 +90,9 @@
                     {{ $task->title }}
                 </span>
 
+                <span class="text-sm px-2 py-1 rounded {{ $task->priority->color() }}">
+                    {{ $task->priority->label() }}
+                </span>
                 <div class="flex gap-2">
                     <form method="POST" action="/tasks/{{ $task->id }}/toggle">
                         @csrf
