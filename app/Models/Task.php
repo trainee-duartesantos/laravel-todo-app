@@ -17,4 +17,10 @@ class Task extends Model
         'status' => TaskStatus::class,
         'completed' => 'boolean',
     ];
+
+    // Helper opcional (muito útil na view)
+    public function isCompleted(): bool
+    {
+        return $this->status->isCompleted();
+    }
 }

@@ -43,7 +43,7 @@
                         @method('PATCH')
 
                         <button class="text-sm px-2 py-1 border rounded">
-                            {{ $task->completed ? '↩️ Reabrir' : '✅ Concluir' }}
+                            {{ $task->isCompleted() ? '↩️ Reabrir' : '✅ Concluir' }}
                         </button>
                     </form>
 
