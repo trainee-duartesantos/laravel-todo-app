@@ -29,19 +29,22 @@
         </button>
     </form>
 
-    <div class="flex justify-center gap-4 mb-6">
+    <div class="flex justify-center gap-2 mb-6">
         <a href="/tasks"
-        class="{{ empty($currentStatus) ? 'font-bold underline' : '' }}">
+        class="px-3 py-1 rounded border
+        {{ !$currentStatus ? 'bg-blue-600 text-white' : '' }}">
             Todas
         </a>
 
         <a href="/tasks?status=pending"
-        class="{{ $currentStatus === 'pending' ? 'font-bold underline' : '' }}">
+        class="px-3 py-1 rounded border
+        {{ $currentStatus === 'pending' ? 'bg-blue-600 text-white' : '' }}">
             Pendentes
         </a>
 
         <a href="/tasks?status=completed"
-        class="{{ $currentStatus === 'completed' ? 'font-bold underline' : '' }}">
+        class="px-3 py-1 rounded border
+        {{ $currentStatus === 'completed' ? 'bg-blue-600 text-white' : '' }}">
             Concluídas
         </a>
     </div>
