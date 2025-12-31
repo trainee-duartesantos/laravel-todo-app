@@ -146,7 +146,16 @@
     {{-- Lista --}}
     <ul class="space-y-2">
         @foreach ($tasks as $task)
-            <li class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 bg-gray-50 px-4 py-2 rounded">
+            <li
+                class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 bg-gray-50 px-4 py-2 rounded cursor-pointer hover:bg-gray-100"
+                onclick="openModal(
+                    '{{ $task->title }}',
+                    '{{ $task->status->value }}',
+                    '{{ $task->priority->label() }}',
+                    '{{ $task->due_date?->format('d/m/Y') ?? '—' }}'
+                )"
+            >
+
                 <span class="{{ $task->completed ? 'line-through text-gray-400' : '' }}">
                     {{ $task->title }}
                 </span>
@@ -161,7 +170,7 @@
                     </span>
                 @endif
 
-                <div class="flex gap-2">
+                <div class="flex gap-2" onclick="event.stopPropagation()">
                     <form method="POST" action="/tasks/{{ $task->id }}/toggle">
                         @csrf
                         @method('PATCH')
@@ -183,8 +192,30 @@
             </li>
         @endforeach
     </ul>
-
 </div>
+
+    {{-- Modal --}}
+    <div
+        id="task-modal"
+        class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50"
+    >
+        <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+            <button
+                onclick="closeModal()"
+                class="absolute top-2 right-2 text-gray-500 hover:text-black"
+            >
+                ✕
+            </button>
+
+            <h2 id="modal-title" class="text-xl font-bold mb-4"></h2>
+
+            <div class="space-y-2 text-sm">
+                <p><strong>Estado:</strong> <span id="modal-status"></span></p>
+                <p><strong>Prioridade:</strong> <span id="modal-priority"></span></p>
+                <p><strong>Data limite:</strong> <span id="modal-due"></span></p>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
