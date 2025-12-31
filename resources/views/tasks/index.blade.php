@@ -29,6 +29,23 @@
         </button>
     </form>
 
+    <div class="flex justify-center gap-4 mb-6">
+        <a href="/tasks"
+        class="{{ empty($currentStatus) ? 'font-bold underline' : '' }}">
+            Todas
+        </a>
+
+        <a href="/tasks?status=pending"
+        class="{{ $currentStatus === 'pending' ? 'font-bold underline' : '' }}">
+            Pendentes
+        </a>
+
+        <a href="/tasks?status=completed"
+        class="{{ $currentStatus === 'completed' ? 'font-bold underline' : '' }}">
+            Concluídas
+        </a>
+    </div>
+
     {{-- Lista --}}
     <ul class="space-y-2">
         @foreach ($tasks as $task)

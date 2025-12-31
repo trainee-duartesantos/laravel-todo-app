@@ -12,10 +12,15 @@ class TaskController extends Controller
         protected TaskRepositoryInterface $tasks
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
+        $status = $request->query('status');
+
         return view('tasks.index', [
-            'tasks' => $this->tasks->all(),
+            'tasks' => $this->tasks->all(
+                $status ? TaskStatus::from($status) : null
+            ),
+            'currentStatus' => $status,
         ]);
     }
 
@@ -35,18 +40,18 @@ class TaskController extends Controller
     public function destroy(int $id)
     {
         $task = $this->tasks->find($id);
-
-        abort_if(! $task, 404);
-
         $this->tasks->delete($task);
 
-        return redirect()->back();
+        return redirect('/tasks');
     }
+
     public function toggle(int $id)
     {
-        $this->tasks->toggle($id);
+        $task = $this->tasks->find($id);
+        $this->tasks->toggle($task);
 
-        return redirect()->back();
+        return redirect('/tasks');
     }
+
 
 }

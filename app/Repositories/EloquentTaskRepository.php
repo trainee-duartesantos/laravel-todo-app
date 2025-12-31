@@ -8,9 +8,14 @@ use App\Enums\TaskStatus;
 
 class EloquentTaskRepository implements TaskRepositoryInterface
 {
-    public function all(): Collection
+    public function all(?TaskStatus $status = null): Collection
     {
-        return Task::latest()->get();
+        return Task::query()
+            ->when($status, fn ($q) =>
+                $q->where('status', $status->value)
+            )
+            ->orderByDesc('created_at')
+            ->get();
     }
 
     public function create(array $data): Task
@@ -23,16 +28,18 @@ class EloquentTaskRepository implements TaskRepositoryInterface
         return Task::find($id);
     }
 
-    public function toggle(int $id): void
+    public function delete(Task $task): void
     {
-        $task = Task::findOrFail($id);
+        $task->delete();
+    }
 
-        $task->update([
-            'completed' => ! $task->completed,
-            'status' => $task->completed
-                ? TaskStatus::PENDING
-                : TaskStatus::COMPLETED,
-        ]);
+    public function toggle(Task $task): Task
+    {
+        $task->status = $task->status->toggle();
+        $task->completed = $task->status->isCompleted();
+        $task->save();
+
+        return $task;
     }
 
     public function update(Task $task, array $data): Task
@@ -40,10 +47,5 @@ class EloquentTaskRepository implements TaskRepositoryInterface
         $task->update($data);
 
         return $task;
-    }
-
-    public function delete(Task $task): void
-    {
-        $task->delete();
     }
 }
