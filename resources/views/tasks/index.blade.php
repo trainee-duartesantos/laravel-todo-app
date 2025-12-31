@@ -60,33 +60,84 @@
         </div>
 
         {{-- Prioridade --}}
-        <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-            <a href="/tasks"
-            class="filter-btn {{ !$currentPriority ? 'active' : '' }}">Todas</a>
+        <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex justify-center gap-2 flex-wrap">
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'due' => $currentDue,
+                ])) }}"
+                class="filter-btn {{ !$currentPriority ? 'active' : '' }}">
+                    Todas
+                </a>
 
-            <a href="/tasks?priority=low"
-            class="filter-btn {{ $currentPriority === 'low' ? 'active' : '' }}">Baixa</a>
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => 'low',
+                    'due' => $currentDue,
+                ])) }}"
+                class="filter-btn {{ $currentPriority === 'low' ? 'active' : '' }}">
+                    Baixa
+                </a>
 
-            <a href="/tasks?priority=medium"
-            class="filter-btn {{ $currentPriority === 'medium' ? 'active' : '' }}">Média</a>
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => 'medium',
+                    'due' => $currentDue,
+                ])) }}"
+                class="filter-btn {{ $currentPriority === 'medium' ? 'active' : '' }}">
+                    Média
+                </a>
 
-            <a href="/tasks?priority=high"
-            class="filter-btn {{ $currentPriority === 'high' ? 'active' : '' }}">Alta</a>
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => 'high',
+                    'due' => $currentDue,
+                ])) }}"
+                class="filter-btn {{ $currentPriority === 'high' ? 'active' : '' }}">
+                    Alta
+                </a>
+            </div>
         </div>
 
+
         {{-- Data --}}
-        <div class="bg-gray-50 rounded-lg p-4 space-y-3">
-            <a href="/tasks"
-            class="filter-btn {{ !$currentDue ? 'active' : '' }}">Todas</a>
+        <div class="bg-gray-50 rounded-lg p-4">
+            <div class="flex justify-center gap-2 flex-wrap">
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => $currentPriority,
+                ])) }}"
+                class="filter-btn {{ !$currentDue ? 'active' : '' }}">
+                    Todas
+                </a>
 
-            <a href="/tasks?due=overdue"
-            class="filter-btn {{ $currentDue === 'overdue' ? 'active' : '' }}">Atrasadas</a>
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => $currentPriority,
+                    'due' => 'overdue',
+                ])) }}"
+                class="filter-btn {{ $currentDue === 'overdue' ? 'active' : '' }}">
+                    Atrasadas
+                </a>
 
-            <a href="/tasks?due=today"
-            class="filter-btn {{ $currentDue === 'today' ? 'active' : '' }}">Hoje</a>
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => $currentPriority,
+                    'due' => 'today',
+                ])) }}"
+                class="filter-btn {{ $currentDue === 'today' ? 'active' : '' }}">
+                    Hoje
+                </a>
 
-            <a href="/tasks?due=future"
-            class="filter-btn {{ $currentDue === 'future' ? 'active' : '' }}">Futuras</a>
+                <a href="{{ route('tasks.index', array_filter([
+                    'status' => $currentStatus,
+                    'priority' => $currentPriority,
+                    'due' => 'future',
+                ])) }}"
+                class="filter-btn {{ $currentDue === 'future' ? 'active' : '' }}">
+                    Futuras
+                </a>
+            </div>
         </div>
 
     </div>
