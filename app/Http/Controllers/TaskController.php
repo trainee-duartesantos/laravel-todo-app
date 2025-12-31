@@ -14,27 +14,28 @@ class TaskController extends Controller
     ) {}
 
     public function index(Request $request)
-    {
-        $status = $request->status
-            ? TaskStatus::from($request->status)
-            : null;
-        
-        $priority = $request->priority
-            ? TaskPriority::from($request->priority)
-            : null;
+        {
+            $status = $request->query('status');
+            $priority = $request->query('priority');
+            $due = $request->query('due'); // overdue|today|future|null
 
-        return view('tasks.index', [
-            'tasks' => $this->tasks->all($status, $priority),
-            'currentStatus' => $request->status,
-            'currentPriority' => $request->priority,
-        ]);
-    }
+            $statusEnum = $status ? TaskStatus::tryFrom($status) : null;
+            $priorityEnum = $priority ? TaskPriority::tryFrom($priority) : null;
+
+            return view('tasks.index', [
+                'tasks' => $this->tasks->all($statusEnum, $priorityEnum, $due),
+                'currentStatus' => $status,
+                'currentPriority' => $priority,
+                'currentDue' => $due,
+            ]);
+        }
 
     public function store(Request $request)
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'priority' => ['required'],
+            'due_date' => ['nullable', 'date'],
         ]);
 
         $data['status'] = TaskStatus::PENDING;

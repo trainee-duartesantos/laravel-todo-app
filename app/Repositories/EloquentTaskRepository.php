@@ -11,7 +11,8 @@ class EloquentTaskRepository implements TaskRepositoryInterface
 {
     public function all(
         ?TaskStatus $status = null,
-        ?TaskPriority $priority = null
+        ?TaskPriority $priority = null,
+        ?string $due = null
         ): Collection
     {
         return Task::query()
@@ -21,6 +22,21 @@ class EloquentTaskRepository implements TaskRepositoryInterface
             ->when($priority, fn ($q) =>
                 $q->where('priority', $priority->value)
             )
+            ->when($due, function ($q) use ($due) {
+                $today = now()->toDateString();
+
+                return match ($due) {
+                    'overdue' => $q->whereNotNull('due_date')
+                                  ->whereDate('due_date', '<', $today),
+
+                    'today'   => $q->whereDate('due_date', $today),
+
+                    'future'  => $q->whereNotNull('due_date')
+                                  ->whereDate('due_date', '>', $today),
+
+                    default   => $q,
+                };
+            })
             ->orderByDesc('created_at')
             ->get();
     }

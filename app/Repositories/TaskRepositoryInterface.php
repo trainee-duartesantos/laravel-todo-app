@@ -11,7 +11,8 @@ interface TaskRepositoryInterface
 {
     public function all(
     ?TaskStatus $status = null,
-    ?TaskPriority $priority = null
+    ?TaskPriority $priority = null,
+    ?string $due = null
     ): Collection;
 
     public function create(array $data);

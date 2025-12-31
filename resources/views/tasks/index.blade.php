@@ -7,13 +7,13 @@
 </head>
 <body class="bg-gray-100 min-h-screen">
 
-<div class="max-w-xl mx-auto mt-16 bg-white shadow rounded-lg p-6">
-    <h1 class="text-2xl font-bold mb-6 text-center">
+<div class="max-w-xl mx-auto mt-16 bg-white shadow rounded-lg p-6 space-y-6">
+    <h1 class="text-2xl font-bold text-center">
         📝 To-Do List
     </h1>
 
     {{-- Form adicionar --}}
-    <form method="POST" action="/tasks" class="flex gap-2 mb-6">
+    <form method="POST" action="/tasks" class="flex gap-2">
         @csrf
         <input
             type="text"
@@ -32,6 +32,12 @@
             <option value="high">Alta</option>
         </select>
 
+        <input
+            type="date"
+            name="due_date"
+            class="border rounded px-3 py-2"
+        />
+
         <button
             class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
@@ -39,7 +45,8 @@
         </button>
     </form>
 
-    <div class="flex justify-center gap-2 mb-6">
+    {{-- Filtro por estado --}}
+    <div class="flex justify-center gap-2">
         <a href="/tasks"
         class="px-3 py-1 rounded border
         {{ !$currentStatus ? 'bg-blue-600 text-white' : '' }}">
@@ -59,7 +66,8 @@
         </a>
     </div>
 
-    <div class="flex justify-center gap-2 mb-6">
+    {{-- Filtro por prioridade --}}
+    <div class="flex justify-center gap-2">
         <a href="/tasks"
         class="px-3 py-1 rounded border {{ !$currentPriority ? 'bg-blue-600 text-white' : '' }}">
             Todas
@@ -81,6 +89,27 @@
         </a>
     </div>
 
+    {{-- Filtro por data --}}
+    <div class="flex justify-center gap-2">
+        <a href="/tasks"
+        class="px-3 py-1 rounded border {{ !$currentDue ? 'bg-blue-600 text-white' : '' }}">
+            Todas
+        </a>
+        <a href="/tasks?due=overdue"
+        class="px-3 py-1 rounded border {{ $currentDue === 'overdue' ? 'bg-blue-600 text-white' : '' }}">
+            Atrasadas
+        </a>
+
+        <a href="/tasks?due=today"
+        class="px-3 py-1 rounded border {{ $currentDue === 'today' ? 'bg-blue-600 text-white' : '' }}">
+            Hoje
+        </a>
+
+        <a href="/tasks?due=future"
+        class="px-3 py-1 rounded border {{ $currentDue === 'future' ? 'bg-blue-600 text-white' : '' }}">
+            Futuras
+        </a>
+    </div>
 
     {{-- Lista --}}
     <ul class="space-y-2">
@@ -93,6 +122,13 @@
                 <span class="text-sm px-2 py-1 rounded {{ $task->priority->color() }}">
                     {{ $task->priority->label() }}
                 </span>
+
+                @if ($task->dueStatus()->value !== 'none')
+                    <span class="text-xs px-2 py-1 rounded {{ $task->dueStatus()->color() }}">
+                        {{ $task->dueStatus()->label() }}
+                    </span>
+                @endif
+
                 <div class="flex gap-2">
                     <form method="POST" action="/tasks/{{ $task->id }}/toggle">
                         @csrf
