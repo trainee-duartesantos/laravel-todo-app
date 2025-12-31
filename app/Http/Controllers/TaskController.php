@@ -42,4 +42,11 @@ class TaskController extends Controller
 
         return redirect()->back();
     }
+    public function toggle(int $id)
+    {
+        $this->tasks->toggle($id);
+
+        return redirect()->back();
+    }
+
 }

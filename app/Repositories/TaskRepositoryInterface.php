@@ -13,6 +13,8 @@ interface TaskRepositoryInterface
 
     public function find(int $id): ?Task;
 
+    public function toggle(int $id): void;
+
     public function update(Task $task, array $data): Task;
 
     public function delete(Task $task): void;

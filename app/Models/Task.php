@@ -10,9 +10,11 @@ class Task extends Model
     protected $fillable = [
         'title',
         'status',
+        'completed',
     ];
 
     protected $casts = [
         'status' => TaskStatus::class,
+        'completed' => 'boolean',
     ];
 }
