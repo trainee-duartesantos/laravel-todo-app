@@ -1,6 +1,5 @@
 <template>
     <transition name="fade-scale">
-        <!-- Backdrop: click fora fecha -->
         <div
             v-if="visible && task"
             class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
@@ -16,54 +15,144 @@
                     ✕
                 </button>
 
-                <h2 class="text-lg font-bold mb-4">
-                    {{ task.title }}
-                </h2>
+                <!-- MODO VISUALIZAR -->
+                <template v-if="!editing">
+                    <h2 class="text-lg font-bold mb-4">
+                        {{ task.title }}
+                    </h2>
 
-                <div class="space-y-2">
-                    <p><strong>Estado:</strong> {{ task.status }}</p>
-                    <p><strong>Prioridade:</strong> {{ task.priority }}</p>
-                    <p><strong>Data limite:</strong> {{ task.due }}</p>
-                </div>
+                    <div class="space-y-2">
+                        <p><strong>Estado:</strong> {{ task.status }}</p>
+                        <p><strong>Prioridade:</strong> {{ task.priority }}</p>
+                        <p><strong>Data limite:</strong> {{ task.due }}</p>
+                    </div>
 
-                <hr class="my-5" />
+                    <hr class="my-5" />
 
-                <div class="flex justify-end gap-3">
-                    <button
-                        class="px-4 py-2 rounded text-white"
-                        :class="
-                            task.status === 'completed'
-                                ? 'bg-yellow-600 hover:bg-yellow-700'
-                                : 'bg-green-600 hover:bg-green-700'
-                        "
-                        @click="$emit('toggle')"
-                    >
-                        {{
-                            task.status === "completed" ? "Reabrir" : "Concluir"
-                        }}
-                    </button>
+                    <div class="flex justify-end gap-3">
+                        <button
+                            class="px-4 py-2 rounded bg-gray-200"
+                            @click="editing = true"
+                        >
+                            Editar
+                        </button>
 
-                    <button
-                        class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
-                        @click="$emit('delete')"
-                    >
-                        Eliminar
-                    </button>
-                </div>
+                        <button
+                            class="px-4 py-2 rounded text-white"
+                            :class="
+                                task.status === 'completed'
+                                    ? 'bg-yellow-600'
+                                    : 'bg-green-600'
+                            "
+                            @click="$emit('toggle')"
+                        >
+                            {{
+                                task.status === "completed"
+                                    ? "Reabrir"
+                                    : "Concluir"
+                            }}
+                        </button>
+
+                        <button
+                            class="px-4 py-2 rounded bg-red-600 text-white"
+                            @click="$emit('delete')"
+                        >
+                            Eliminar
+                        </button>
+                    </div>
+                </template>
+
+                <!-- MODO EDITAR -->
+                <template v-else>
+                    <h2 class="text-lg font-bold mb-4">Editar tarefa</h2>
+
+                    <div class="space-y-3">
+                        <input
+                            v-model="form.title"
+                            type="text"
+                            class="w-full border rounded px-3 py-2"
+                        />
+
+                        <select
+                            v-model="form.priority"
+                            class="w-full border rounded px-3 py-2"
+                        >
+                            <option value="low">Baixa</option>
+                            <option value="medium">Média</option>
+                            <option value="high">Alta</option>
+                        </select>
+
+                        <input
+                            v-model="form.due"
+                            type="date"
+                            class="w-full border rounded px-3 py-2"
+                        />
+                    </div>
+
+                    <hr class="my-5" />
+
+                    <div class="flex justify-end gap-3">
+                        <button
+                            class="px-4 py-2 rounded bg-gray-200"
+                            @click="$emit('close')"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            class="px-4 py-2 rounded bg-blue-600 text-white"
+                            @click="save"
+                        >
+                            Guardar
+                        </button>
+                    </div>
+                </template>
             </div>
         </div>
     </transition>
 </template>
 
 <script setup>
-import { onMounted, onUnmounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
     visible: Boolean,
     task: Object,
 });
 
-const emit = defineEmits(["close", "toggle", "delete"]);
+const emit = defineEmits(["close", "toggle", "delete", "save"]);
+
+const editing = ref(false);
+
+const form = ref({
+    title: "",
+    priority: "medium",
+    due: "",
+});
+
+watch(
+    () => props.task,
+    (task) => {
+        if (!task) return;
+
+        form.value = {
+            title: task.title,
+            priority: task.priority_key ?? "medium",
+            due: task.due_raw ?? "",
+        };
+
+        editing.value = false;
+    },
+    { immediate: true }
+);
+
+function save() {
+    emit("save", {
+        title: form.value.title,
+        priority: form.value.priority,
+        due_date: form.value.due,
+    });
+}
 
 function onKeydown(e) {
     if (e.key === "Escape" && props.visible) {

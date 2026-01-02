@@ -46,6 +46,25 @@ class TaskController extends Controller
         return redirect()->back();
     }
 
+    public function update(Request $request, int $id)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
+        ]);
+
+        $task = $this->tasks->find($id);
+        $this->tasks->update($task, $validated);
+
+        // 👇 IMPORTANTE
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->back();
+    }
+
     public function destroy(int $id)
     {
         $task = $this->tasks->find($id);

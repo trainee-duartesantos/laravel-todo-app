@@ -67,7 +67,13 @@ class EloquentTaskRepository implements TaskRepositoryInterface
 
     public function update(Task $task, array $data): Task
     {
-        $task->update($data);
+        $task->fill([
+            'title' => $data['title'],
+            'priority' => $data['priority'],
+            'due_date' => $data['due_date'] ?? null,
+        ]);
+
+        $task->save();
 
         return $task;
     }

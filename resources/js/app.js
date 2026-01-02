@@ -9,16 +9,30 @@ createApp({
                 visible: false,
                 task: null,
             },
+            actionTaskId: null,
+            editForm: {
+                title: "",
+                priority: "",
+                due: "",
+            },
         };
     },
+
     methods: {
         openFromElement(event) {
             const raw = event.currentTarget?.dataset?.task;
             if (!raw) return;
 
             const task = JSON.parse(raw);
+
             this.modal.task = task;
             this.modal.visible = true;
+
+            // preparar edição
+            this.actionTaskId = task.id;
+            this.editForm.title = task.title;
+            this.editForm.priority = task.priority_key ?? "medium";
+            this.editForm.due = task.due_raw ?? "";
         },
 
         close() {
@@ -27,26 +41,48 @@ createApp({
         },
 
         toggleFromModal() {
-            const id = this.modal?.task?.id;
-            if (!id) return;
-
-            const form = document.getElementById(`toggle-form-${id}`);
-            if (!form) return;
-
-            form.submit(); // faz PATCH /toggle
+            const form = document.getElementById(
+                `toggle-form-${this.actionTaskId}`
+            );
+            if (form) form.submit();
         },
 
         deleteFromModal() {
-            const id = this.modal?.task?.id;
-            if (!id) return;
-
             if (!confirm("Tens a certeza que queres eliminar esta tarefa?"))
                 return;
 
-            const form = document.getElementById(`delete-form-${id}`);
-            if (!form) return;
+            const form = document.getElementById(
+                `delete-form-${this.actionTaskId}`
+            );
+            if (form) form.submit();
+        },
 
-            form.submit(); // faz DELETE
+        saveFromModal(data) {
+            if (!this.modal?.task?.id) return;
+
+            fetch(`/tasks/${this.modal.task.id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute("content"),
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    title: data.title,
+                    priority: data.priority,
+                    due_date: data.due_date,
+                }),
+            })
+                .then((response) => {
+                    if (!response.ok) throw new Error("Erro ao guardar tarefa");
+                    window.location.reload(); // 🔄 atualiza lista
+                })
+                .catch((err) => {
+                    console.error(err);
+                    alert("Erro ao guardar tarefa");
+                });
         },
     },
 })

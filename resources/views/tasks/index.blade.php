@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>To-Do App</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
 <body class="bg-gray-100 min-h-screen flex justify-center">
@@ -11,7 +12,7 @@
         <div class="max-w-xl mx-auto mt-16 bg-white shadow rounded-lg p-6 space-y-6">
 
             <h1 class="text-2xl font-bold text-center">
-                📝 To-Do List
+                📝 Lista de Tarefas
             </h1>
 
             {{-- Form adicionar --}}
@@ -49,13 +50,15 @@
                 @foreach ($tasks as $task)
                     @php
                         $taskForModal = json_encode([
-                            'id'       => $task->id,
-                            'title'    => $task->title,
-                            'status'   => $task->status->value,
+                            'id' => $task->id,
+                            'title' => $task->title,
+                            'status' => $task->status->value,
                             'priority' => $task->priority->label(),
-                            'due'      => $task->due_date
+                            'priority_key' => $task->priority->value,
+                            'due' => $task->due_date
                                 ? $task->due_date->format('d/m/Y')
                                 : '—',
+                            'due_raw' => $task->due_date?->format('Y-m-d') ?? '',
                         ]);
                     @endphp
 
@@ -105,6 +108,7 @@
             @close="close"
             @toggle="toggleFromModal"
             @delete="deleteFromModal"
+            @save="saveFromModal"
         />
 
 
@@ -127,6 +131,7 @@
             @csrf
             @method('DELETE')
         </form>
+
     </div>
 </body>
 </html>
