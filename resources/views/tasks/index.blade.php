@@ -26,18 +26,19 @@
                     required
                 >
 
-                <select name="priority" class="border rounded px-3 py-2 w-[110px]">
+                <select name="priority" class="border rounded px-3 py-2 w-[120px]">
+                    <option value="prioridade" selected>Prioridade</option>
                     <option value="low">Baixa</option>
-                    <option value="medium" selected>Média</option>
+                    <option value="medium">Média</option>
                     <option value="high">Alta</option>
                 </select>
 
                 <input
                     type="date"
                     name="due_date"
-                    class="border rounded px-3 py-2 w-[110px]"
+                    class="border rounded px-3 py-2 w-[150px]"
                 >
-
+                
                 <button class="bg-blue-600 text-white px-4 py-2 rounded">
                     Adicionar
                 </button>
@@ -46,9 +47,9 @@
             {{-- Lista --}}
             <ul class="space-y-2">
                 @foreach ($tasks as $task)
-
                     @php
                         $taskForModal = json_encode([
+                            'id'       => $task->id,
                             'title'    => $task->title,
                             'status'   => $task->status->value,
                             'priority' => $task->priority->label(),
@@ -62,8 +63,9 @@
                         class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3
                             bg-gray-50 px-4 py-2 rounded cursor-pointer hover:bg-gray-100"
                         data-task='{{ $taskForModal }}'
-                        @click="openFromElement"
+                        @click="openFromElement($event)"
                     >
+
                         <span>{{ $task->title }}</span>
 
                         <span class="text-sm px-2 py-1 rounded {{ $task->priority->color() }}">
@@ -71,22 +73,25 @@
                         </span>
 
                         <div class="flex gap-2" @click.stop>
-                            <form method="POST" action="/tasks/{{ $task->id }}/toggle">
+                            <form id="toggle-form-{{ $task->id }}" method="POST" action="/tasks/{{ $task->id }}/toggle">
                                 @csrf
                                 @method('PATCH')
-                                <button class="text-sm border px-2 py-1 rounded">
+
+                                <button class="text-sm px-2 py-1 border rounded">
                                     {{ $task->isCompleted() ? '↩️ Reabrir' : '✅ Concluir' }}
                                 </button>
                             </form>
 
-                            <form method="POST" action="/tasks/{{ $task->id }}">
+                            <form id="delete-form-{{ $task->id }}" method="POST" action="/tasks/{{ $task->id }}">
                                 @csrf
                                 @method('DELETE')
-                                <button class="text-sm border px-2 py-1 rounded text-red-500">
+
+                                <button class="text-sm px-2 py-1 border rounded text-red-500">
                                     🗑
                                 </button>
                             </form>
                         </div>
+
                     </li>
 
                 @endforeach
@@ -98,7 +103,30 @@
             :visible="modal.visible"
             :task="modal.task"
             @close="close"
+            @toggle="toggleFromModal"
+            @delete="deleteFromModal"
         />
+
+
+        <form
+            ref="toggleForm"
+            method="POST"
+            :action="`/tasks/${actionTaskId}/toggle`"
+            style="display:none"
+        >
+            @csrf
+            @method('PATCH')
+        </form>
+
+        <form
+            ref="deleteForm"
+            method="POST"
+            :action="`/tasks/${actionTaskId}`"
+            style="display:none"
+        >
+            @csrf
+            @method('DELETE')
+        </form>
     </div>
 </body>
 </html>
