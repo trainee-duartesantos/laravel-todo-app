@@ -1,16 +1,27 @@
 import "./bootstrap";
+import { createApp } from "vue";
+import TaskModal from "./vue/components/TaskModal.vue";
 
-window.openModal = function (title, status, priority, due) {
-    document.getElementById("modal-title").innerText = title;
-    document.getElementById("modal-status").innerText = status;
-    document.getElementById("modal-priority").innerText = priority;
-    document.getElementById("modal-due").innerText = due;
-
-    document.getElementById("task-modal").classList.remove("hidden");
-    document.getElementById("task-modal").classList.add("flex");
-};
-
-window.closeModal = function () {
-    document.getElementById("task-modal").classList.add("hidden");
-    document.getElementById("task-modal").classList.remove("flex");
-};
+createApp({
+    data() {
+        return {
+            modal: {
+                visible: false,
+                task: null,
+            },
+        };
+    },
+    methods: {
+        openFromElement(event) {
+            const task = JSON.parse(event.currentTarget.dataset.task);
+            this.modal.task = task;
+            this.modal.visible = true;
+        },
+        close() {
+            this.modal.visible = false;
+            this.modal.task = null;
+        },
+    },
+})
+    .component("task-modal", TaskModal)
+    .mount("#app");
