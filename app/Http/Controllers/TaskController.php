@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\TaskStatus;
+use App\Enums\TaskDueStatus;
 use App\Repositories\TaskRepositoryInterface;
 use Illuminate\Http\Request;
 use App\Enums\TaskPriority;
@@ -21,9 +22,10 @@ class TaskController extends Controller
 
             $statusEnum = $status ? TaskStatus::tryFrom($status) : null;
             $priorityEnum = $priority ? TaskPriority::tryFrom($priority) : null;
+            $dueEnum = $due ? TaskDueStatus::tryFrom($due) : null;
 
             return view('tasks.index', [
-                'tasks' => $this->tasks->all($statusEnum, $priorityEnum, $due),
+                'tasks' => $this->tasks->all($statusEnum, $priorityEnum, $dueEnum),
                 'currentStatus' => $status,
                 'currentPriority' => $priority,
                 'currentDue' => $due,
@@ -43,7 +45,11 @@ class TaskController extends Controller
 
         $this->tasks->create($data);
 
-        return redirect()->back();
+        return redirect()->route(
+            'tasks.index',
+            $request->except('_token', '_method')
+        );
+
     }
 
     public function update(Request $request, int $id)
@@ -62,24 +68,28 @@ class TaskController extends Controller
             return response()->json(['success' => true]);
         }
 
-        return redirect()->back();
+        return redirect()->route('tasks.index', request()->query());
     }
 
-    public function destroy(int $id)
+    public function destroy(Request $request, int $id)
     {
         $task = $this->tasks->find($id);
         $this->tasks->delete($task);
 
-        return redirect('/tasks');
+        return redirect()->route(
+            'tasks.index',
+            $request->except('_token', '_method')
+        );
     }
 
-    public function toggle(int $id)
+    public function toggle(Request $request, int $id)
     {
         $task = $this->tasks->find($id);
         $this->tasks->toggle($task);
 
-        return redirect('/tasks');
+        return redirect()->route(
+            'tasks.index',
+            $request->except('_token', '_method')
+        );
     }
-
-
 }

@@ -45,6 +45,53 @@
                 </button>
             </form>
 
+            <form method="GET" action="/tasks" class="flex flex-wrap gap-2">
+                <select name="status" class="border rounded px-3 py-2">
+                    <option value="">Estado</option>
+                    @foreach (\App\Enums\TaskStatus::cases() as $s)
+                        <option
+                            value="{{ $s->value }}"
+                            @selected($currentStatus === $s->value)
+                        >
+                            {{ ucfirst($s->value) }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="priority" class="border rounded px-3 py-2">
+                    <option value="">Prioridade</option>
+                    @foreach (\App\Enums\TaskPriority::cases() as $p)
+                        <option
+                            value="{{ $p->value }}"
+                            @selected($currentPriority === $p->value)
+                        >
+                            {{ $p->label() }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <select name="due" class="border rounded px-3 py-2">
+                    <option value="">Data</option>
+                    @foreach (\App\Enums\TaskDueStatus::cases() as $d)
+                        <option
+                            value="{{ $d->value }}"
+                            @selected($currentDue === $d->value)
+                        >
+                            {{ ucfirst($d->value) }}
+                        </option>
+                    @endforeach
+                </select>
+
+                <button class="bg-gray-200 px-4 py-2 rounded">
+                    Filtrar
+                </button>
+
+                <a href="/tasks" class="text-sm px-3 py-2 border rounded">
+                    Limpar
+                </a>
+            </form>
+
+
             {{-- Lista --}}
             <ul class="space-y-2">
                 @foreach ($tasks as $task)
@@ -76,18 +123,27 @@
                         </span>
 
                         <div class="flex gap-2" @click.stop>
-                            <form id="toggle-form-{{ $task->id }}" method="POST" action="/tasks/{{ $task->id }}/toggle">
+                            <form method="POST" action="/tasks/{{ $task->id }}/toggle">
                                 @csrf
                                 @method('PATCH')
+
+                                @foreach(request()->query() as $key => $value)
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endforeach
 
                                 <button class="text-sm px-2 py-1 border rounded">
                                     {{ $task->isCompleted() ? '↩️ Reabrir' : '✅ Concluir' }}
                                 </button>
                             </form>
 
-                            <form id="delete-form-{{ $task->id }}" method="POST" action="/tasks/{{ $task->id }}">
+
+                                                        <form method="POST" action="/tasks/{{ $task->id }}">
                                 @csrf
                                 @method('DELETE')
+
+                                @foreach(request()->query() as $key => $value)
+                                    <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                @endforeach
 
                                 <button class="text-sm px-2 py-1 border rounded text-red-500">
                                     🗑

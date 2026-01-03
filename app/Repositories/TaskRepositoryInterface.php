@@ -5,14 +5,15 @@ namespace App\Repositories;
 use App\Models\Task;
 use App\Enums\TaskStatus;
 use App\Enums\TaskPriority;
+use App\Enums\TaskDueStatus;
 use Illuminate\Support\Collection;
 
 interface TaskRepositoryInterface
 {
     public function all(
-    ?TaskStatus $status = null,
-    ?TaskPriority $priority = null,
-    ?string $due = null
+        ?TaskStatus $status,
+        ?TaskPriority $priority,
+        ?TaskDueStatus $due
     ): Collection;
 
     public function create(array $data);

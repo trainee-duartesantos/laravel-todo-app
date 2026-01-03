@@ -6,38 +6,52 @@ use App\Models\Task;
 use Illuminate\Support\Collection;
 use App\Enums\TaskStatus;
 use App\Enums\TaskPriority;
+use App\Enums\TaskDueStatus;
 
 class EloquentTaskRepository implements TaskRepositoryInterface
 {
     public function all(
-        ?TaskStatus $status = null,
-        ?TaskPriority $priority = null,
-        ?string $due = null
+            ?TaskStatus $status,
+            ?TaskPriority $priority,
+            ?TaskDueStatus $due
         ): Collection
     {
-        return Task::query()
-            ->when($status, fn ($q) =>
-                $q->where('status', $status->value)
-            )
-            ->when($priority, fn ($q) =>
-                $q->where('priority', $priority->value)
-            )
-            ->when($due, function ($q) use ($due) {
-                $today = now()->toDateString();
+        $query = Task::query();
 
-                return match ($due) {
-                    'overdue' => $q->whereNotNull('due_date')
-                                  ->whereDate('due_date', '<', $today),
+        // Estado
+        if ($status) {
+            $query->where('status', $status->value);
+        }
 
-                    'today'   => $q->whereDate('due_date', $today),
+        // Prioridade
+        if ($priority) {
+            $query->where('priority', $priority->value);
+        }
 
-                    'future'  => $q->whereNotNull('due_date')
-                                  ->whereDate('due_date', '>', $today),
+        // Vencimento
+        if ($due) {
+            $today = now()->toDateString();
 
-                    default   => $q,
-                };
-            })
-            ->orderByDesc('created_at')
+            match ($due) {
+                TaskDueStatus::OVERDUE =>
+                    $query->whereNotNull('due_date')
+                          ->whereDate('due_date', '<', $today),
+
+                TaskDueStatus::TODAY =>
+                    $query->whereDate('due_date', $today),
+
+                TaskDueStatus::FUTURE =>
+                    $query->whereDate('due_date', '>', $today),
+
+                TaskDueStatus::NONE =>
+                    $query->whereNull('due_date'),
+            };
+        }
+
+        return $query
+            ->orderBy('completed')
+            ->orderByRaw('due_date IS NULL')
+            ->orderBy('due_date')
             ->get();
     }
 
