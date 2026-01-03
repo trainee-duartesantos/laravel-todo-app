@@ -111,16 +111,31 @@
 
                     <li
                         class="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3
-                            bg-gray-50 px-4 py-2 rounded cursor-pointer hover:bg-gray-100"
+                        px-4 py-2 rounded cursor-pointer hover:bg-gray-100
+                        {{ $task->isCompleted() ? 'bg-gray-50 opacity-70' : 'bg-white' }}"
                         data-task='{{ $taskForModal }}'
                         @click="openFromElement($event)"
                     >
 
                         <span>{{ $task->title }}</span>
 
-                        <span class="text-sm px-2 py-1 rounded {{ $task->priority->color() }}">
-                            {{ $task->priority->label() }}
-                        </span>
+                        <div class="flex gap-2">
+                            {{-- Prioridade --}}
+                            <span class="text-sm px-2 py-1 rounded {{ $task->priority->color() }}">
+                                {{ $task->priority->label() }}
+                            </span>
+
+                            {{-- Status --}}
+                            @if ($task->isCompleted())
+                                <span class="text-sm px-2 py-1 rounded bg-green-100 text-green-700">
+                                    Concluída
+                                </span>
+                            @else
+                                <span class="text-sm px-2 py-1 rounded bg-yellow-100 text-yellow-700">
+                                    Pendente
+                                </span>
+                            @endif
+                        </div>
 
                         <div class="flex gap-2" @click.stop>
                             <form method="POST" action="/tasks/{{ $task->id }}/toggle">
