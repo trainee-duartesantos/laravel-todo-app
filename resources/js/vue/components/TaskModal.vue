@@ -3,12 +3,16 @@
         <div
             v-if="visible && task"
             class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
             @click.self="$emit('close')"
         >
             <div
                 class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
             >
                 <button
+                    aria-label="Fechar modal"
                     class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
                     @click="$emit('close')"
                 >
@@ -17,7 +21,7 @@
 
                 <!-- MODO VISUALIZAR -->
                 <template v-if="!editing">
-                    <h2 class="text-lg font-bold mb-4">
+                    <h2 id="modal-title" class="text-lg font-bold mb-4">
                         {{ task.title }}
                     </h2>
 
@@ -64,7 +68,9 @@
 
                 <!-- MODO EDITAR -->
                 <template v-else>
-                    <h2 class="text-lg font-bold mb-4">Editar tarefa</h2>
+                    <h2 id="modal-title" class="text-lg font-bold mb-4">
+                        Editar tarefa
+                    </h2>
 
                     <div class="space-y-3">
                         <input

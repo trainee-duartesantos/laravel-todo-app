@@ -19,34 +19,39 @@
             <form method="POST" action="/tasks" class="flex flex-wrap gap-2">
                 @csrf
 
+                <label for="title" class="sr-only">Título da tarefa</label>
                 <input
+                    id="title"
                     type="text"
                     name="title"
                     placeholder="Nova tarefa…"
-                    class="flex-1 min-w-[200px] border rounded px-3 py-2"
+                    class="flex-1 min-w-[220px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                     required
-                >
+                />
 
-                <select name="priority" class="border rounded px-3 py-2 w-[120px]">
+                <select id="priority" name="priority" class="flex-1 min-w-[60px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                     <option value="prioridade" selected>Prioridade</option>
                     <option value="low">Baixa</option>
                     <option value="medium">Média</option>
                     <option value="high">Alta</option>
                 </select>
 
+                <label for="due_date" class="sr-only">Data</label>
                 <input
+                    id="due_date"
                     type="date"
                     name="due_date"
-                    class="border rounded px-3 py-2 w-[150px]"
+                    class="flex-1 min-w-[130px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                 >
                 
-                <button class="bg-blue-600 text-white px-4 py-2 rounded">
+                <button class="bg-blue-600 text-white px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300
+">
                     Adicionar
                 </button>
             </form>
 
             <form method="GET" action="/tasks" class="flex flex-wrap gap-2">
-                <select name="status" class="border rounded px-3 py-2">
+                <select name="status" class="border rounded px-3 py-2 ">
                     <option value="">Estado</option>
                     @foreach (\App\Enums\TaskStatus::cases() as $s)
                         <option
@@ -82,7 +87,7 @@
                     @endforeach
                 </select>
 
-                <button class="bg-gray-200 px-4 py-2 rounded">
+                <button class="bg-gray-200 px-4 py-2 rounded focus:outline-none focus:ring focus:ring-blue-300">
                     Filtrar
                 </button>
 
@@ -146,7 +151,7 @@
                                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                 @endforeach
 
-                                <button class="text-sm px-2 py-1 border rounded">
+                                <button class="text-sm px-2 py-1 border rounded focus:outline-none focus:ring focus:ring-blue-300">
                                     {{ $task->isCompleted() ? '↩️ Reabrir' : '✅ Concluir' }}
                                 </button>
                             </form>
@@ -160,7 +165,7 @@
                                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                 @endforeach
 
-                                <button class="text-sm px-2 py-1 border rounded text-red-500">
+                                <button class="text-sm px-2 py-1 border rounded text-red-500 focus:outline-none focus:ring focus:ring-blue-300" aria-label="Eliminar tarefa" title="Eliminar tarefa">
                                     🗑
                                 </button>
                             </form>
