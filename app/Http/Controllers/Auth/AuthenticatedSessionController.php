@@ -28,7 +28,9 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('tasks.index'));
+        return redirect()
+            ->intended(route('tasks.index'))
+            ->with('welcome', 'Bem-vindo, ' . auth()->user()->name . ' 👋');
     }
 
     /**

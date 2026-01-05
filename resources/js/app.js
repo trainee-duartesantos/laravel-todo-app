@@ -1,11 +1,16 @@
-console.log("Vue app.js carregado");
 import { createApp, reactive } from "vue";
 import TaskModal from "./vue/components/TaskModal.vue";
+import Toast from "./vue/components/Toast.vue";
 
 const state = reactive({
     visible: false,
     task: null,
     actionTaskId: null,
+
+    toast: {
+        visible: false,
+        message: "",
+    },
 });
 
 const app = createApp({
@@ -18,13 +23,34 @@ const app = createApp({
 
         function toggleFromModal() {
             document.getElementById("toggle-form").submit();
+            showToast("Estado da tarefa atualizado ✔️");
         }
 
         function deleteFromModal() {
             if (confirm("Eliminar esta tarefa?")) {
                 document.getElementById("delete-form").submit();
+                showToast("Tarefa eliminada 🗑️");
             }
         }
+
+        function showToast(message) {
+            state.toast.message = message;
+            state.toast.visible = true;
+        }
+
+        function closeToast() {
+            state.toast.visible = false;
+        }
+
+        return {
+            state,
+            close,
+            toggleFromModal,
+            deleteFromModal,
+            saveFromModal,
+            showToast,
+            closeToast,
+        };
 
         async function saveFromModal(data) {
             await fetch(`/tasks/${state.actionTaskId}`, {
@@ -39,7 +65,8 @@ const app = createApp({
                 body: JSON.stringify(data),
             });
 
-            window.location.reload();
+            showToast("Tarefa atualizada ✔️");
+            setTimeout(() => window.location.reload(), 800);
         }
 
         return {
@@ -50,7 +77,7 @@ const app = createApp({
             saveFromModal,
         };
     },
-    components: { TaskModal },
+    components: { TaskModal, Toast },
     template: `
         <task-modal
             :visible="state.visible"
@@ -59,6 +86,12 @@ const app = createApp({
             @toggle="toggleFromModal"
             @delete="deleteFromModal"
             @save="saveFromModal"
+        />
+
+        <toast
+            :visible="state.toast.visible"
+            :message="state.toast.message"
+            @close="closeToast"
         />
     `,
 });

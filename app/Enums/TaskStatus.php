@@ -18,4 +18,12 @@ enum TaskStatus: string
     {
         return $this === self::COMPLETED;
     }
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::PENDING => 'Pendente',
+            self::COMPLETED => 'Concluída',
+        };
+    }
 }

@@ -19,6 +19,16 @@
                         📝 Lista de Tarefas
                     </h1>
 
+                    @if (session('welcome'))
+                        <div
+                            class="mb-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 flex items-center gap-2
+                                animate-[fadeIn_0.3s_ease-out]"
+                        >
+                            <span>👋</span>
+                            <span>{{ session('welcome') }}</span>
+                        </div>
+                    @endif
+
                     <div class="flex items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
 
                         @auth
@@ -85,17 +95,18 @@
             </form>
 
             <form method="GET" action="/tasks" class="flex flex-col sm:flex-row gap-2">
-                <select name="status" class="w-full sm:w-auto border rounded px-3 py-2 ">
+                <select name="status" class="w-full sm:w-auto border rounded px-3 py-2">
                     <option value="">Estado</option>
-                    @foreach (\App\Enums\TaskStatus::cases() as $s)
+                    @foreach (\App\Enums\TaskStatus::cases() as $status)
                         <option
-                            value="{{ $s->value }}"
-                            @selected($currentStatus === $s->value)
+                            value="{{ $status->value }}"
+                            @selected($currentStatus === $status->value)
                         >
-                            {{ ucfirst($s->value) }}
+                            {{ $status->label() }}
                         </option>
                     @endforeach
                 </select>
+
 
                 <select name="priority" class="w-full sm:w-auto border rounded px-3 py-2">
                     <option value="">Prioridade</option>
@@ -111,15 +122,16 @@
 
                 <select name="due" class="w-full sm:w-auto border rounded px-3 py-2">
                     <option value="">Data</option>
-                    @foreach (\App\Enums\TaskDueStatus::cases() as $d)
+                    @foreach (\App\Enums\TaskDueStatus::cases() as $due)
                         <option
-                            value="{{ $d->value }}"
-                            @selected($currentDue === $d->value)
+                            value="{{ $due->value }}"
+                            @selected($currentDue === $due->value)
                         >
-                            {{ ucfirst($d->value) }}
+                            {{ $due->label() }}
                         </option>
                     @endforeach
                 </select>
+
 
                 <button class="w-full sm:w-auto
                                 text-sm px-2 py-1

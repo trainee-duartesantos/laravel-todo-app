@@ -44,7 +44,7 @@ enum TaskDueStatus: string
             self::OVERDUE => 'Atrasada',
             self::TODAY => 'Hoje',
             self::FUTURE => 'Futura',
-            self::NONE => '',
+            self::NONE => 'Sem data',
         };
     }
 }
