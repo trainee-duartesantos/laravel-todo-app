@@ -1,17 +1,38 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TaskController;
 
-Route::get('/', [TaskController::class, 'index']);
+Route::get('/', function () {
+    return redirect()->route('tasks.index');
+});
 
-Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
-Route::post('/tasks', [TaskController::class, 'store']);
+Route::middleware('auth')->group(function () {
 
-Route::patch('/tasks/{id}', [TaskController::class, 'update']);
+    Route::get('/tasks', [TaskController::class, 'index'])
+        ->name('tasks.index');
 
-Route::patch('/tasks/{id}/toggle', [TaskController::class, 'toggle']);
-Route::delete('/tasks/{id}', [TaskController::class, 'destroy']);
+    Route::post('/tasks', [TaskController::class, 'store'])
+        ->name('tasks.store');
 
+    Route::patch('/tasks/{task}/toggle', [TaskController::class, 'toggle'])
+        ->name('tasks.toggle');
 
+    Route::delete('/tasks/{task}', [TaskController::class, 'destroy'])
+        ->name('tasks.destroy');
 
+    Route::get('/profile', [ProfileController::class, 'edit'])
+        ->name('profile.edit');
+
+    Route::patch('/profile', [ProfileController::class, 'update'])
+        ->name('profile.update');
+
+    Route::delete('/profile', [ProfileController::class, 'destroy'])
+        ->name('profile.destroy');
+
+    Route::patch('/tasks/{task}', [TaskController::class, 'update'])
+        ->name('tasks.update');
+});
+
+require __DIR__.'/auth.php';

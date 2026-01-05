@@ -1,66 +1,33 @@
-import "./bootstrap";
-import { createApp } from "vue";
+console.log("Vue app.js carregado");
+import { createApp, reactive } from "vue";
 import TaskModal from "./vue/components/TaskModal.vue";
 
-createApp({
-    data() {
-        return {
-            modal: {
-                visible: false,
-                task: null,
-            },
-            actionTaskId: null,
-            editForm: {
-                title: "",
-                priority: "",
-                due: "",
-            },
-        };
-    },
+const state = reactive({
+    visible: false,
+    task: null,
+    actionTaskId: null,
+});
 
-    methods: {
-        openFromElement(event) {
-            const raw = event.currentTarget?.dataset?.task;
-            if (!raw) return;
+const app = createApp({
+    setup() {
+        function close() {
+            state.visible = false;
+            state.task = null;
+            state.actionTaskId = null;
+        }
 
-            const task = JSON.parse(raw);
+        function toggleFromModal() {
+            document.getElementById("toggle-form").submit();
+        }
 
-            this.modal.task = task;
-            this.modal.visible = true;
+        function deleteFromModal() {
+            if (confirm("Eliminar esta tarefa?")) {
+                document.getElementById("delete-form").submit();
+            }
+        }
 
-            // preparar edição
-            this.actionTaskId = task.id;
-            this.editForm.title = task.title;
-            this.editForm.priority = task.priority_key ?? "medium";
-            this.editForm.due = task.due_raw ?? "";
-        },
-
-        close() {
-            this.modal.visible = false;
-            this.modal.task = null;
-        },
-
-        toggleFromModal() {
-            const form = document.getElementById(
-                `toggle-form-${this.actionTaskId}`
-            );
-            if (form) form.submit();
-        },
-
-        deleteFromModal() {
-            if (!confirm("Tens a certeza que queres eliminar esta tarefa?"))
-                return;
-
-            const form = document.getElementById(
-                `delete-form-${this.actionTaskId}`
-            );
-            if (form) form.submit();
-        },
-
-        saveFromModal(data) {
-            if (!this.modal?.task?.id) return;
-
-            fetch(`/tasks/${this.modal.task.id}`, {
+        async function saveFromModal(data) {
+            await fetch(`/tasks/${state.actionTaskId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -69,22 +36,46 @@ createApp({
                         .getAttribute("content"),
                     Accept: "application/json",
                 },
-                body: JSON.stringify({
-                    title: data.title,
-                    priority: data.priority,
-                    due_date: data.due_date,
-                }),
-            })
-                .then((response) => {
-                    if (!response.ok) throw new Error("Erro ao guardar tarefa");
-                    window.location.reload(); // 🔄 atualiza lista
-                })
-                .catch((err) => {
-                    console.error(err);
-                    alert("Erro ao guardar tarefa");
-                });
-        },
+                body: JSON.stringify(data),
+            });
+
+            window.location.reload();
+        }
+
+        return {
+            state,
+            close,
+            toggleFromModal,
+            deleteFromModal,
+            saveFromModal,
+        };
     },
-})
-    .component("task-modal", TaskModal)
-    .mount("#app");
+    components: { TaskModal },
+    template: `
+        <task-modal
+            :visible="state.visible"
+            :task="state.task"
+            @close="close"
+            @toggle="toggleFromModal"
+            @delete="deleteFromModal"
+            @save="saveFromModal"
+        />
+    `,
+});
+
+app.mount("#task-modal-root");
+
+// 🌍 Função chamada pelo Blade
+window.openFromElement = function (event) {
+    console.log("CLICK NA TAREFA");
+    const el = event.currentTarget;
+    const task = JSON.parse(el.dataset.task);
+
+    state.task = task;
+    state.visible = true;
+    state.actionTaskId = task.id;
+
+    document.getElementById("toggle-form").action = `/tasks/${task.id}/toggle`;
+
+    document.getElementById("delete-form").action = `/tasks/${task.id}`;
+};

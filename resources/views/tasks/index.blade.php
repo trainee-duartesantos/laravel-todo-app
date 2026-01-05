@@ -14,20 +14,36 @@
             
             <div class="bg-white shadow rounded-xl p-4 sm:p-6 space-y-6">
                 <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between border-b sm:border-b-0 pb-3 sm:pb-0">
+
                     <h1 class="text-2xl font-bold flex items-center gap-2">
                         📝 Lista de Tarefas
                     </h1>
 
                     <div class="flex items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
-                        <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold select-none">
-                            DS
-                        </div>
 
-                        <button class="text-sm text-gray-600 hover:text-gray-900 transition">
-                            Sair
-                        </button>
+                        @auth
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                                </div>
+
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button class="text-sm text-gray-600 hover:text-gray-900">
+                                        Sair
+                                    </button>
+                                </form>
+                            </div>
+                        @endauth
+
+                        @guest
+                            <a href="{{ route('login') }}" class="text-sm text-gray-600 hover:text-gray-900">
+                                Entrar
+                            </a>
+                        @endguest
                     </div>
                 </div>
+
 
             {{-- Form adicionar --}}
             <form method="POST" action="/tasks" class="flex flex-col sm:flex-row gap-2">
@@ -158,7 +174,7 @@
                             : 'bg-white border-l-4 border-yellow-400' }}
                         "
                         data-task='{{ $taskForModal }}'
-                        @click="openFromElement($event)"
+                        onclick="openFromElement(event)"
                     >
 
 
@@ -196,7 +212,7 @@
                         </div>
 
 
-                        <div class="flex items-center gap-2" @click.stop>
+                        <div class="flex items-center gap-2" onclick="event.stopPropagation()">
                             <form method="POST" action="/tasks/{{ $task->id }}/toggle">
                                 @csrf
                                 @method('PATCH')
@@ -252,36 +268,17 @@
         </div>
 
         {{-- Modal Vue --}}
-        <task-modal
-            :visible="modal.visible"
-            :task="modal.task"
-            @close="close"
-            @toggle="toggleFromModal"
-            @delete="deleteFromModal"
-            @save="saveFromModal"
-        />
+        <div id="task-modal-root"></div>
 
-
-        <form
-            ref="toggleForm"
-            method="POST"
-            :action="`/tasks/${actionTaskId}/toggle`"
-            style="display:none"
-        >
+        <form id="toggle-form" method="POST" style="display:none">
             @csrf
             @method('PATCH')
         </form>
 
-        <form
-            ref="deleteForm"
-            method="POST"
-            :action="`/tasks/${actionTaskId}`"
-            style="display:none"
-        >
+        <form id="delete-form" method="POST" style="display:none">
             @csrf
             @method('DELETE')
         </form>
 
-    </div>
 </body>
 </html>

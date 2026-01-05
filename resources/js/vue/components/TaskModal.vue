@@ -6,26 +6,27 @@
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            @click.self="$emit('close')"
+            @click.self="emit('close')"
         >
             <div
                 class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
             >
+                <!-- Fechar -->
                 <button
                     aria-label="Fechar modal"
                     class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
-                    @click="$emit('close')"
+                    @click="emit('close')"
                 >
                     ✕
                 </button>
 
-                <!-- MODO VISUALIZAR -->
+                <!-- ================= MODO VISUALIZAR ================= -->
                 <template v-if="!editing">
                     <h2 id="modal-title" class="text-lg font-bold mb-4">
                         {{ task.title }}
                     </h2>
 
-                    <div class="space-y-2">
+                    <div class="space-y-2 text-sm">
                         <p><strong>Estado:</strong> {{ task.status }}</p>
                         <p><strong>Prioridade:</strong> {{ task.priority }}</p>
                         <p><strong>Data limite:</strong> {{ task.due }}</p>
@@ -35,7 +36,7 @@
 
                     <div class="flex justify-end gap-3">
                         <button
-                            class="px-4 py-2 rounded bg-gray-200"
+                            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
                             @click="editing = true"
                         >
                             Editar
@@ -45,10 +46,10 @@
                             class="px-4 py-2 rounded text-white"
                             :class="
                                 task.status === 'completed'
-                                    ? 'bg-yellow-600'
-                                    : 'bg-green-600'
+                                    ? 'bg-yellow-600 hover:bg-yellow-700'
+                                    : 'bg-green-600 hover:bg-green-700'
                             "
-                            @click="$emit('toggle')"
+                            @click="emit('toggle')"
                         >
                             {{
                                 task.status === "completed"
@@ -58,15 +59,15 @@
                         </button>
 
                         <button
-                            class="px-4 py-2 rounded bg-red-600 text-white"
-                            @click="$emit('delete')"
+                            class="px-4 py-2 rounded bg-red-600 hover:bg-red-700 text-white"
+                            @click="emit('delete')"
                         >
                             Eliminar
                         </button>
                     </div>
                 </template>
 
-                <!-- MODO EDITAR -->
+                <!-- ================= MODO EDITAR ================= -->
                 <template v-else>
                     <h2 id="modal-title" class="text-lg font-bold mb-4">
                         Editar tarefa
@@ -74,14 +75,17 @@
 
                     <div class="space-y-3">
                         <input
+                            ref="titleInput"
                             v-model="form.title"
                             type="text"
-                            class="w-full border rounded px-3 py-2"
+                            class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
+                            @keydown.enter.prevent="save"
+                            @keydown.esc="emit('close')"
                         />
 
                         <select
                             v-model="form.priority"
-                            class="w-full border rounded px-3 py-2"
+                            class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
                         >
                             <option value="low">Baixa</option>
                             <option value="medium">Média</option>
@@ -91,7 +95,7 @@
                         <input
                             v-model="form.due"
                             type="date"
-                            class="w-full border rounded px-3 py-2"
+                            class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
                         />
                     </div>
 
@@ -99,17 +103,19 @@
 
                     <div class="flex justify-end gap-3">
                         <button
-                            class="px-4 py-2 rounded bg-gray-200"
-                            @click="$emit('close')"
+                            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                            @click="emit('close')"
                         >
                             Cancelar
                         </button>
 
                         <button
-                            class="px-4 py-2 rounded bg-blue-600 text-white"
+                            class="px-4 py-2 rounded bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+                            :disabled="saving"
                             @click="save"
                         >
-                            Guardar
+                            <span v-if="saving">A guardar…</span>
+                            <span v-else>Guardar</span>
                         </button>
                     </div>
                 </template>
@@ -119,7 +125,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from "vue";
+import { ref, watch, nextTick, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
     visible: Boolean,
@@ -129,6 +135,8 @@ const props = defineProps({
 const emit = defineEmits(["close", "toggle", "delete", "save"]);
 
 const editing = ref(false);
+const saving = ref(false);
+const titleInput = ref(null);
 
 const form = ref({
     title: "",
@@ -136,6 +144,7 @@ const form = ref({
     due: "",
 });
 
+/* Sync tarefa → form */
 watch(
     () => props.task,
     (task) => {
@@ -152,14 +161,32 @@ watch(
     { immediate: true }
 );
 
-function save() {
-    emit("save", {
+/* Foco automático + bloquear scroll */
+watch(
+    () => props.visible,
+    async (visible) => {
+        document.body.style.overflow = visible ? "hidden" : "";
+
+        if (visible) {
+            await nextTick();
+            titleInput.value?.focus();
+        }
+    }
+);
+
+async function save() {
+    saving.value = true;
+
+    await emit("save", {
         title: form.value.title,
         priority: form.value.priority,
         due_date: form.value.due,
     });
+
+    saving.value = false;
 }
 
+/* Fechar com ESC */
 function onKeydown(e) {
     if (e.key === "Escape" && props.visible) {
         emit("close");
@@ -173,11 +200,14 @@ onUnmounted(() => window.removeEventListener("keydown", onKeydown));
 <style scoped>
 .fade-scale-enter-active,
 .fade-scale-leave-active {
-    transition: all 0.2s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
-.fade-scale-enter-from,
+.fade-scale-enter-from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+}
 .fade-scale-leave-to {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.97);
 }
 </style>
