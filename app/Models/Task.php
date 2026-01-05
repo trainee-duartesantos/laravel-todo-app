@@ -32,6 +32,10 @@ class Task extends Model
 
     public function dueStatus(): TaskDueStatus
     {
+        if ($this->isCompleted()) {
+            return TaskDueStatus::NONE;
+        }
+
         return TaskDueStatus::fromDate($this->due_date);
     }
 }

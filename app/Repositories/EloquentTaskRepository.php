@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use App\Enums\TaskStatus;
 use App\Enums\TaskPriority;
 use App\Enums\TaskDueStatus;
+use Illuminate\Database\Eloquent\Builder;
 
 class EloquentTaskRepository implements TaskRepositoryInterface
 {
@@ -35,7 +36,8 @@ class EloquentTaskRepository implements TaskRepositoryInterface
             match ($due) {
                 TaskDueStatus::OVERDUE =>
                     $query->whereNotNull('due_date')
-                          ->whereDate('due_date', '<', $today),
+                            ->whereDate('due_date', '<', $today)
+                            ->where('completed', false),
 
                 TaskDueStatus::TODAY =>
                     $query->whereDate('due_date', $today),
@@ -50,7 +52,14 @@ class EloquentTaskRepository implements TaskRepositoryInterface
 
         return $query
             ->orderBy('completed')
-            ->orderByRaw('due_date IS NULL')
+            ->orderByRaw("
+                CASE
+                    WHEN due_date IS NULL THEN 4
+                    WHEN due_date < CURDATE() THEN 0
+                    WHEN due_date = CURDATE() THEN 1
+                    ELSE 2
+                END
+            ")
             ->orderBy('due_date')
             ->get();
     }

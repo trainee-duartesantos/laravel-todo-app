@@ -2,21 +2,35 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do App</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 
-<body class="bg-gray-100 min-h-screen flex justify-center">
+<body class="bg-gray-100 min-h-screen">
     <div id="app" class="w-full">
-        <div class="max-w-xl mx-auto mt-16 bg-white shadow rounded-lg p-6 space-y-6">
+        <div class="mx-auto w-full max-w-7xl px-3 sm:px-6 lg:px-8 mt-6 sm:mt-10">
+            
+            <div class="bg-white shadow rounded-xl p-4 sm:p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between border-b sm:border-b-0 pb-3 sm:pb-0">
+                    <h1 class="text-2xl font-bold flex items-center gap-2">
+                        📝 Lista de Tarefas
+                    </h1>
 
-            <h1 class="text-2xl font-bold text-center">
-                📝 Lista de Tarefas
-            </h1>
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-start sm:justify-end">
+                        <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold select-none">
+                            DS
+                        </div>
+
+                        <button class="text-sm text-gray-600 hover:text-gray-900 transition">
+                            Sair
+                        </button>
+                    </div>
+                </div>
 
             {{-- Form adicionar --}}
-            <form method="POST" action="/tasks" class="flex flex-wrap gap-2">
+            <form method="POST" action="/tasks" class="flex flex-col sm:flex-row gap-2">
                 @csrf
 
                 <label for="title" class="sr-only">Título da tarefa</label>
@@ -25,11 +39,11 @@
                     type="text"
                     name="title"
                     placeholder="Nova tarefa…"
-                    class="flex-1 min-w-[220px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                    class="w-full sm:flex-1 border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                     required
                 />
 
-                <select id="priority" name="priority" class="flex-1 min-w-[60px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
+                <select id="priority" name="priority" class="w-full sm:w-[120px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300">
                     <option value="prioridade" selected>Prioridade</option>
                     <option value="low">Baixa</option>
                     <option value="medium">Média</option>
@@ -41,10 +55,11 @@
                     id="due_date"
                     type="date"
                     name="due_date"
-                    class="flex-1 min-w-[130px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
+                    class="w-full sm:w-[150px] border rounded px-3 py-2 focus:outline-none focus:ring focus:ring-blue-300"
                 >
                 
-                <button class="bg-blue-600 text-white px-4 py-2 rounded transition
+                <button class="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded 
+                                transition
                                 hover:shadow-sm
                                 active:scale-95
                                 focus:outline-none focus:ring focus:ring-blue-300
@@ -53,8 +68,8 @@
                 </button>
             </form>
 
-            <form method="GET" action="/tasks" class="flex flex-wrap gap-2">
-                <select name="status" class="border rounded px-3 py-2 ">
+            <form method="GET" action="/tasks" class="flex flex-col sm:flex-row gap-2">
+                <select name="status" class="w-full sm:w-auto border rounded px-3 py-2 ">
                     <option value="">Estado</option>
                     @foreach (\App\Enums\TaskStatus::cases() as $s)
                         <option
@@ -66,7 +81,7 @@
                     @endforeach
                 </select>
 
-                <select name="priority" class="border rounded px-3 py-2">
+                <select name="priority" class="w-full sm:w-auto border rounded px-3 py-2">
                     <option value="">Prioridade</option>
                     @foreach (\App\Enums\TaskPriority::cases() as $p)
                         <option
@@ -78,7 +93,7 @@
                     @endforeach
                 </select>
 
-                <select name="due" class="border rounded px-3 py-2">
+                <select name="due" class="w-full sm:w-auto border rounded px-3 py-2">
                     <option value="">Data</option>
                     @foreach (\App\Enums\TaskDueStatus::cases() as $d)
                         <option
@@ -90,7 +105,8 @@
                     @endforeach
                 </select>
 
-                <button class="text-sm px-2 py-1
+                <button class="w-full sm:w-auto
+                                text-sm px-2 py-1
                                 border rounded
                                 transition hover:shadow-sm
                                 active:scale-95
@@ -101,7 +117,7 @@
                     Filtrar
                 </button>
 
-                <a href="/tasks" class="text-sm px-3 py-2 border rounded">
+                <a href="/tasks" class="w-full sm:w-auto text-center text-sm px-3 py-2 border rounded">
                     Limpar
                 </a>
             </form>
@@ -122,11 +138,15 @@
                                 : '—',
                             'due_raw' => $task->due_date?->format('Y-m-d') ?? '',
                         ]);
+
+                        $dueStatus = $task->dueStatus();
                     @endphp
 
                     <li
                         class="
-                            flex items-center justify-between gap-4
+                            flex flex-col sm:flex-row
+                            sm:items-center sm:justify-between
+                            gap-3
                             px-4 py-3 rounded-lg
                             cursor-pointer
                             transition
@@ -148,10 +168,7 @@
                             </p>
 
                             <div class="mt-1 flex flex-wrap gap-2 text-sm">
-                                {{-- Prioridade --}}
-                                <span class="px-2 py-0.5 rounded {{ $task->priority->color() }}">
-                                    {{ $task->priority->label() }}
-                                </span>
+                                
 
                                 {{-- Estado --}}
                                 @if ($task->isCompleted())
@@ -161,6 +178,18 @@
                                 @else
                                     <span class="px-2 py-0.5 rounded bg-yellow-100 text-yellow-700">
                                         Pendente
+                                    </span>
+                                @endif
+
+                                {{-- Prioridade --}}
+                                <span class="px-2 py-0.5 rounded {{ $task->priority->color() }}">
+                                    {{ $task->priority->label() }}
+                                </span>
+
+                                {{-- Data --}}
+                                @if ($dueStatus !== \App\Enums\TaskDueStatus::NONE)
+                                    <span class="px-2 py-0.5 rounded {{ $dueStatus->color() }}">
+                                        {{ $dueStatus->label() }}
                                     </span>
                                 @endif
                             </div>
@@ -176,8 +205,10 @@
                                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                 @endforeach
 
-                                <button class="text-sm px-2 py-1
+                                <button class="flex-1 sm:flex-none
+                                                text-sm px-2 py-1
                                                 border rounded
+                                                cursor-pointer
                                                 transition hover:shadow-sm
                                                 active:scale-95
                                                 focus:outline-none
@@ -196,8 +227,10 @@
                                     <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                 @endforeach
 
-                                <button class="text-sm px-2 py-1
+                                <button class="flex-1 sm:flex-none
+                                                text-sm px-2 py-1
                                                 border rounded
+                                                cursor-pointer
                                                 transition
                                                 hover:bg-red-50
                                                 active:scale-95
