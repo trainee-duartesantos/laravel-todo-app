@@ -30,7 +30,7 @@ class AuthenticatedSessionController extends Controller
 
         return redirect()
             ->intended(route('tasks.index'))
-            ->with('welcome', 'Bem-vindo, ' . auth()->user()->name . ' 👋');
+            ->with('welcome', 'Bem-vindo, ' . Auth::user()->name . ' 👋');
     }
 
     /**

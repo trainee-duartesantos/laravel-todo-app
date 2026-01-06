@@ -46,11 +46,9 @@ class TaskController extends Controller
 
         $this->tasks->create($data);
 
-        return redirect()->route(
-            'tasks.index',
-            $request->except('_token', '_method')
-        );
-
+        return redirect()
+        ->route('tasks.index')
+        ->with('success', 'Tarefa criada com sucesso ✔️');
     }
 
     public function update(Request $request, int $id)
