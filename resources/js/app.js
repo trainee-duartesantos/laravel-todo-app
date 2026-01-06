@@ -54,14 +54,21 @@ const app = createApp({
                 body: JSON.stringify(data),
             });
 
-            const json = await res.json();
+            if (!res.ok) {
+                alert("Erro ao guardar a tarefa");
+                return;
+            }
 
-            // 🔥 atualizar o modal
-            state.task = json.task;
-
+            // 🔔 feedback
             showToast("Tarefa atualizada ✔️");
-            console.log("ANTES:", state.task);
-            console.log("RESPOSTA:", json.task);
+
+            // ❌ fecha o modal
+            state.visible = false;
+            state.task = null;
+            state.actionTaskId = null;
+
+            // 🔄 atualiza a lista
+            window.location.reload();
         }
 
         return {

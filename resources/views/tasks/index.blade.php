@@ -35,7 +35,7 @@
                         @auth
                             <div class="flex items-center gap-3">
                                 <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center text-sm font-semibold">
-                                    {{ strtoupper(substr(auth()->user()->name, 0, 2)) }}
+                                    {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
                                 </div>
 
                                 <form method="POST" action="{{ route('logout') }}">
@@ -151,6 +151,9 @@
                 </a>
             </form>
 
+            @php
+                $highlightId = request('highlight');
+            @endphp
 
             {{-- Lista --}}
             <ul class="space-y-2">
@@ -173,6 +176,7 @@
                     @endphp
 
                     <li
+                        id="task-{{ $task->id }}"
                         class="
                             flex flex-col sm:flex-row
                             sm:items-center sm:justify-between
@@ -183,9 +187,12 @@
                             hover:scale-[1.01]
                             active:scale-[0.99]
                             hover:shadow-sm hover:bg-gray-50
-                            {{ $task->isCompleted() 
-                            ? 'bg-gray-50 opacity-70 border-l-4 border-green-400 line-through' 
-                            : 'bg-white border-l-4 border-yellow-400' }}
+                            {{ $task->id == $highlightId
+                                ? 'bg-blue-50 border-l-4 border-blue-500 animate-highlight'
+                                : ($task->isCompleted()
+                                    ? 'bg-gray-50 opacity-70 border-l-4 border-green-400 line-through'
+                                    : 'bg-white border-l-4 border-yellow-400')
+                            }}
                         "
                         data-task='{{ $taskForModal }}'
                         onclick="openFromElement(event)"
@@ -322,6 +329,24 @@
             @csrf
             @method('DELETE')
         </form>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const highlightId = new URLSearchParams(window.location.search).get('highlight');
+
+            if (!highlightId) return;
+
+            const taskElement = document.getElementById(`task-${highlightId}`);
+
+            if (!taskElement) return;
+
+            setTimeout(() => {
+                taskElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 150);
+        });
+    </script>
 
 </body>
 </html>

@@ -44,12 +44,15 @@ class TaskController extends Controller
         $data['status'] = TaskStatus::PENDING;
         $data['completed'] = false;
 
-        $this->tasks->create($data);
+        $task = $this->tasks->create($data);
 
         return redirect()
-        ->route('tasks.index')
-        ->with('success', 'Tarefa criada com sucesso ✔️');
+            ->route('tasks.index', [
+                'highlight' => $task->id,
+            ])
+            ->with('success', 'Tarefa criada com sucesso ✔️');
     }
+
 
     public function update(Request $request, int $id)
     {

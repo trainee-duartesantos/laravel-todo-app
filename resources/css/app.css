@@ -23,3 +23,16 @@
         transform: translateY(0);
     }
 }
+
+@keyframes highlight {
+    0% {
+        background-color: #dbeafe; /* azul claro */
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+.animate-highlight {
+    animation: highlight 2.5s ease-out forwards;
+}
