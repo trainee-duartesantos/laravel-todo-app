@@ -153,7 +153,7 @@
 
             {{-- Lista --}}
             <ul class="space-y-2">
-                @foreach ($tasks as $task)
+                @forelse ($tasks as $task)
                     @php
                         $taskForModal = json_encode([
                             'id' => $task->id,
@@ -187,11 +187,8 @@
                             : 'bg-white border-l-4 border-yellow-400' }}
                         "
                         data-task='{{ $taskForModal }}'
-                        onclick="openFromElement(event)
-                        "
+                        onclick="openFromElement(event)"
                     >
-
-
                         <div class="min-w-0">
                             <p class="font-medium truncate">
                                 {{ $task->title }}
@@ -277,7 +274,36 @@
 
                     </li>
 
-                @endforeach
+                    @empty
+                    {{-- EMPTY STATE --}}
+                    <li class="py-12">
+                        <div class="text-center text-gray-500 space-y-3">
+                            <div class="text-4xl">🗒️</div>
+
+                            <p class="text-lg font-medium text-gray-700">
+                                Nenhuma tarefa encontrada
+                            </p>
+
+                            @if(request()->hasAny(['status', 'priority', 'due']))
+                                <p class="text-sm">
+                                    Tenta ajustar ou limpar os filtros aplicados.
+                                </p>
+
+                                <a
+                                    href="{{ route('tasks.index') }}"
+                                    class="inline-block mt-2 text-sm text-blue-600 hover:underline"
+                                >
+                                    Limpar filtros
+                                </a>
+                            @else
+                                <p class="text-sm">
+                                    Começa por adicionar a tua primeira tarefa 👆
+                                </p>
+                            @endif
+                        </div>
+                    </li>
+
+                @endforelse
             </ul>
         </div>
 
