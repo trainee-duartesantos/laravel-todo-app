@@ -107,3 +107,13 @@ window.openFromElement = function (event) {
     document.getElementById("toggle-form").action = `/tasks/${task.id}/toggle`;
     document.getElementById("delete-form").action = `/tasks/${task.id}`;
 };
+
+const flash = document.getElementById("welcome-flash");
+
+if (flash) {
+    setTimeout(() => {
+        flash.classList.add("transition", "opacity-0", "translate-y-1");
+
+        setTimeout(() => flash.remove(), 300);
+    }, 3000); // 👈 tempo visível (3s)
+}

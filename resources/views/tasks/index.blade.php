@@ -21,6 +21,7 @@
 
                     @if (session('welcome'))
                         <div
+                            id="welcome-flash"
                             class="mb-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 flex items-center gap-2
                                 animate-[fadeIn_0.3s_ease-out]"
                         >
@@ -159,7 +160,7 @@
                             'id' => $task->id,
                             'title' => $task->title,
                             'description' => $task->description,
-                            'status' => $task->status->value,
+                            'status' => $task->status->label(),
                             'priority' => $task->priority->label(),
                             'priority_key' => $task->priority->value,
                             'due' => $task->due_date
