@@ -1,59 +1,118 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 📝 To-Do App
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplicação web simples e intuitiva para gestão de tarefas (To-Do List), desenvolvida com **Laravel**, **Tailwind CSS** e **Vue.js** (uso pontual), com foco em boa UX, código limpo e arquitetura organizada.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## 🎯 Objetivo
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Permitir que os utilizadores organizem as suas tarefas diárias de forma eficiente, com suporte a prioridades, datas de vencimento, filtros e edição rápida através de um modal.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## 🏗️ Arquitetura
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+A aplicação segue as boas práticas do **Laravel MVC**, com algumas decisões arquiteturais importantes:
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- **MVC (Model–View–Controller)** para separação de responsabilidades
+- **Repository Pattern** para desacoplar a lógica de acesso a dados
+- **Enums** para estados, prioridades e vencimentos (evita strings mágicas)
+- **Blade** como motor principal de views
+- **Vue.js** usado apenas para componentes interativos (modal e toast), não sendo uma SPA
 
-## Laravel Sponsors
+Estrutura pensada para ser simples, escalável e fácil de manter.
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+---
 
-### Premium Partners
+## ✨ Funcionalidades
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 🆕 Criação de tarefas
+- Criar tarefas com:
+  - Título (obrigatório)
+  - Descrição (opcional)
+  - Prioridade: baixa, média ou alta
+  - Data de vencimento (opcional)
 
-## Contributing
+### 📋 Listagem de tarefas
+- Visualização de todas as tarefas
+- Filtros por:
+  - Estado (pendente, concluída)
+  - Prioridade
+  - Data de vencimento
+- Estados vazios (empty states) com mensagens contextuais
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### ✏️ Edição de tarefas
+- Edição via **modal**
+- Campos editáveis:
+  - Título
+  - Descrição
+  - Prioridade
+  - Data de vencimento
+- Atualização via JSON (AJAX)
 
-## Code of Conduct
+### ✅ Gestão de estado
+- Marcar tarefas como concluídas
+- Reabrir tarefas concluídas
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 🗑️ Exclusão
+- Eliminação individual de tarefas com confirmação
 
-## Security Vulnerabilities
+### 🎨 UX / UI
+- Design limpo e responsivo
+- Feedback visual:
+  - Toasts (ex: “Tarefa atualizada ✔️”)
+  - Mensagem flash de boas-vindas
+- Animações subtis
+- Modal acessível (ESC, foco automático, overlay)
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 🔐 Autenticação
+- Proteção da rota `/tasks`
+- Utilizadores não autenticados são redirecionados para login
 
-## License
+---
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## 🖥️ Tech Stack
+
+### Backend
+- **Laravel 12**
+- PHP 8+
+- MySQL
+- PHPUnit
+
+### Frontend
+- **Tailwind CSS**
+- Blade
+- Vue.js 3 (uso pontual)
+- JavaScript básico
+
+---
+
+## 🗄️ Base de Dados
+
+Tabela `tasks` com os seguintes campos principais:
+- `title`
+- `description`
+- `status`
+- `priority`
+- `due_date`
+- `completed`
+
+Uso de:
+- Enums para estados e prioridades
+- Casts no model
+- Queries otimizadas no repositório
+
+---
+
+## 🧪 Testes
+
+A aplicação inclui testes **unitários** e **de integração**, cobrindo:
+
+- Estados da tarefa
+- Criação de tarefas via HTTP
+- Proteção de rotas
+- Atualização de tarefas via JSON
+
+### Executar testes relacionados com tarefas:
+```bash
+php artisan test --filter=Task
