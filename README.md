@@ -116,3 +116,18 @@ A aplicação inclui testes **unitários** e **de integração**, cobrindo:
 ### Executar testes relacionados com tarefas:
 ```bash
 php artisan test --filter=Task
+
+---
+
+## Deploy
+
+Este projeto foi desenvolvido e testado localmente.
+
+Para colocar em produção num servidor:
+- Clonar o repositório
+- Configurar o ficheiro `.env`
+- Executar migrations
+- Compilar assets
+- Configurar servidor web (Apache/Nginx)
+
+O deploy final não está incluído neste projeto.
