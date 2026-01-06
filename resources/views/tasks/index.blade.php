@@ -278,7 +278,9 @@
                     @empty
                     {{-- EMPTY STATE --}}
                     <li class="py-12">
-                        <div class="text-center text-gray-500 space-y-3">
+                        <div class="text-center text-gray-500 space-y-3
+                                    animate-[fadeUp_0.4s_ease-out]"
+                        >
                             <div class="text-4xl">🗒️</div>
 
                             <p class="text-lg font-medium text-gray-700">

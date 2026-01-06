@@ -15,26 +15,27 @@ class TaskIntegrationTest extends TestCase
     /** @test */
     public function it_creates_a_task_and_displays_it_in_the_list()
     {
-        // 1️⃣ Criar tarefa via HTTP (como um utilizador real)
-        $response = $this->post('/tasks', [
-            'title' => 'Teste de integração',
-            'priority' => TaskPriority::MEDIUM->value,
-            'due_date' => null,
-        ]);
+        $user = \App\Models\User::factory()->create();
 
-        // 2️⃣ Verificar redirect (UX correta)
+        $response = $this
+            ->actingAs($user)
+            ->post('/tasks', [
+                'title' => 'Teste de integração',
+                'priority' => TaskPriority::MEDIUM->value,
+                'due_date' => null,
+            ]);
+
         $response->assertRedirect();
 
-        // 3️⃣ Confirmar que a tarefa existe na base de dados
         $this->assertDatabaseHas('tasks', [
             'title' => 'Teste de integração',
             'priority' => TaskPriority::MEDIUM->value,
             'status' => TaskStatus::PENDING->value,
         ]);
 
-        // 4️⃣ Confirmar que aparece na listagem
-        $listResponse = $this->get('/tasks');
-        $listResponse->assertStatus(200);
+        $listResponse = $this->actingAs($user)->get('/tasks');
+        $listResponse->assertOk();
         $listResponse->assertSee('Teste de integração');
     }
+
 }
