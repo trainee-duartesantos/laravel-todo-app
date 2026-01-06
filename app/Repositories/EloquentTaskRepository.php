@@ -92,6 +92,7 @@ class EloquentTaskRepository implements TaskRepositoryInterface
     {
         $task->fill([
             'title' => $data['title'],
+            'description' => $data['description'] ?? null,
             'priority' => $data['priority'],
             'due_date' => $data['due_date'] ?? null,
         ]);

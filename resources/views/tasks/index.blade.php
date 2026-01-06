@@ -158,6 +158,7 @@
                         $taskForModal = json_encode([
                             'id' => $task->id,
                             'title' => $task->title,
+                            'description' => $task->description,
                             'status' => $task->status->value,
                             'priority' => $task->priority->label(),
                             'priority_key' => $task->priority->value,
@@ -186,7 +187,8 @@
                             : 'bg-white border-l-4 border-yellow-400' }}
                         "
                         data-task='{{ $taskForModal }}'
-                        onclick="openFromElement(event)"
+                        onclick="openFromElement(event)
+                        "
                     >
 
 

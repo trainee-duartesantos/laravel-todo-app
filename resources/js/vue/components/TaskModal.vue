@@ -6,7 +6,7 @@
             role="dialog"
             aria-modal="true"
             aria-labelledby="modal-title"
-            @click.self="emit('close')"
+            @click.self="close"
         >
             <div
                 class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative"
@@ -15,7 +15,7 @@
                 <button
                     aria-label="Fechar modal"
                     class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 text-xl"
-                    @click="emit('close')"
+                    @click="close"
                 >
                     ✕
                 </button>
@@ -30,6 +30,15 @@
                         <p><strong>Estado:</strong> {{ task.status }}</p>
                         <p><strong>Prioridade:</strong> {{ task.priority }}</p>
                         <p><strong>Data limite:</strong> {{ task.due }}</p>
+                    </div>
+
+                    <div v-if="task.description" class="mt-4">
+                        <p class="text-sm text-gray-500 mb-1">Descrição</p>
+                        <div
+                            class="p-3 bg-gray-50 rounded text-sm whitespace-pre-line"
+                        >
+                            {{ task.description }}
+                        </div>
                     </div>
 
                     <hr class="my-5" />
@@ -80,7 +89,7 @@
                             type="text"
                             class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
                             @keydown.enter.prevent="save"
-                            @keydown.esc="emit('close')"
+                            @keydown.esc="close"
                         />
 
                         <select
@@ -97,6 +106,13 @@
                             type="date"
                             class="w-full border rounded px-3 py-2 focus:ring focus:ring-blue-300"
                         />
+
+                        <textarea
+                            v-model="form.description"
+                            rows="4"
+                            placeholder="Descrição (opcional)"
+                            class="w-full border rounded px-3 py-2 text-sm resize-none focus:ring focus:ring-blue-300"
+                        />
                     </div>
 
                     <hr class="my-5" />
@@ -104,7 +120,7 @@
                     <div class="flex justify-end gap-3">
                         <button
                             class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
-                            @click="emit('close')"
+                            @click="close"
                         >
                             Cancelar
                         </button>
@@ -140,6 +156,7 @@ const titleInput = ref(null);
 
 const form = ref({
     title: "",
+    description: "",
     priority: "medium",
     due: "",
 });
@@ -152,6 +169,7 @@ watch(
 
         form.value = {
             title: task.title,
+            description: task.description ?? "",
             priority: task.priority_key ?? "medium",
             due: task.due_raw ?? "",
         };
@@ -163,11 +181,9 @@ watch(
 
 /* Foco automático + bloquear scroll */
 watch(
-    () => props.visible,
-    async (visible) => {
-        document.body.style.overflow = visible ? "hidden" : "";
-
-        if (visible) {
+    () => editing.value,
+    async (isEditing) => {
+        if (isEditing) {
             await nextTick();
             titleInput.value?.focus();
         }
@@ -179,6 +195,7 @@ async function save() {
 
     await emit("save", {
         title: form.value.title,
+        description: form.value.description,
         priority: form.value.priority,
         due_date: form.value.due,
     });
@@ -189,8 +206,14 @@ async function save() {
 /* Fechar com ESC */
 function onKeydown(e) {
     if (e.key === "Escape" && props.visible) {
-        emit("close");
+        close();
     }
+}
+
+function close() {
+    editing.value = false;
+    saving.value = false;
+    emit("close");
 }
 
 onMounted(() => window.addEventListener("keydown", onKeydown));

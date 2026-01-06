@@ -36,6 +36,7 @@ class TaskController extends Controller
     {
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'description' => 'nullable|string',
             'priority' => ['required'],
             'due_date' => ['nullable', 'date'],
         ]);
@@ -56,6 +57,7 @@ class TaskController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable|date',
         ]);
@@ -63,12 +65,28 @@ class TaskController extends Controller
         $task = $this->tasks->find($id);
         $this->tasks->update($task, $validated);
 
-        // 👇 IMPORTANTE
+        // 🔥 Resposta JSON para Vue
         if ($request->expectsJson()) {
-            return response()->json(['success' => true]);
+            $task = $task->fresh();
+
+            return response()->json([
+                'task' => [
+                    'id' => $task->id,
+                    'title' => $task->title,
+                    'description' => $task->description,
+                    'status' => $task->status->value,
+                    'priority' => $task->priority->label(),
+                    'priority_key' => $task->priority->value,
+                    'due' => $task->due_date
+                        ? $task->due_date->format('d/m/Y')
+                        : '—',
+                    'due_raw' => $task->due_date?->format('Y-m-d') ?? '',
+                ],
+            ]);
         }
 
-        return redirect()->route('tasks.index', request()->query());
+        // 🧭 Fallback HTML
+        return redirect()->route('tasks.index', $request->query());
     }
 
     public function destroy(Request $request, int $id)

@@ -6,7 +6,6 @@ const state = reactive({
     visible: false,
     task: null,
     actionTaskId: null,
-
     toast: {
         visible: false,
         message: "",
@@ -21,6 +20,15 @@ const app = createApp({
             state.actionTaskId = null;
         }
 
+        function showToast(message) {
+            state.toast.message = message;
+            state.toast.visible = true;
+        }
+
+        function closeToast() {
+            state.toast.visible = false;
+        }
+
         function toggleFromModal() {
             document.getElementById("toggle-form").submit();
             showToast("Estado da tarefa atualizado ✔️");
@@ -33,27 +41,8 @@ const app = createApp({
             }
         }
 
-        function showToast(message) {
-            state.toast.message = message;
-            state.toast.visible = true;
-        }
-
-        function closeToast() {
-            state.toast.visible = false;
-        }
-
-        return {
-            state,
-            close,
-            toggleFromModal,
-            deleteFromModal,
-            saveFromModal,
-            showToast,
-            closeToast,
-        };
-
         async function saveFromModal(data) {
-            await fetch(`/tasks/${state.actionTaskId}`, {
+            const res = await fetch(`/tasks/${state.actionTaskId}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -65,8 +54,14 @@ const app = createApp({
                 body: JSON.stringify(data),
             });
 
+            const json = await res.json();
+
+            // 🔥 atualizar o modal
+            state.task = json.task;
+
             showToast("Tarefa atualizada ✔️");
-            setTimeout(() => window.location.reload(), 800);
+            console.log("ANTES:", state.task);
+            console.log("RESPOSTA:", json.task);
         }
 
         return {
@@ -75,6 +70,8 @@ const app = createApp({
             toggleFromModal,
             deleteFromModal,
             saveFromModal,
+            showToast,
+            closeToast,
         };
     },
     components: { TaskModal, Toast },
@@ -98,9 +95,8 @@ const app = createApp({
 
 app.mount("#task-modal-root");
 
-// 🌍 Função chamada pelo Blade
+// 🌍 Função global chamada pelo Blade
 window.openFromElement = function (event) {
-    console.log("CLICK NA TAREFA");
     const el = event.currentTarget;
     const task = JSON.parse(el.dataset.task);
 
@@ -109,6 +105,5 @@ window.openFromElement = function (event) {
     state.actionTaskId = task.id;
 
     document.getElementById("toggle-form").action = `/tasks/${task.id}/toggle`;
-
     document.getElementById("delete-form").action = `/tasks/${task.id}`;
 };
